@@ -177,3 +177,4 @@
   (when (file-directory-p "C:/raghav/")
     (setq projectile-project-search-path '("C:/raghav/")))
   (setq projectile-switch-project-action #'projectile-dired))
+
