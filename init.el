@@ -6,7 +6,9 @@
  '(custom-safe-themes
    '("e8ab68ce371f48623dab9658d7910458e98affec3e09585a39552dbd3fd1ecda" "d9c038dc91688c433de8e83709449563ec6475b900a21d7016856035ae4dcd32" "0d12b08dec64641c5df1a13d2c52ad678f6235a9b1c86041ea457fc1a71651dc" "2d09bd884d697b48b380b48117ccaebd8e99fe1cb242e31675dcec5724c603f6" "9b64a681308383067359cf06bfa6a1bc4fa75c5b68182e4d6ba4d1816277d70e" "64204b9e3ad01000654d5524d2904fc8fa28aafc168f48660897ddfe36a2bfd5" "8e08bb8da358e2cf92e10e4bac47b025ccbcf4c70788cdbd67dc4ed11f786194" "82f0f47ac811eeb45fbcfc5fee48989e4d0bca11f74653b838c29fab9a20aee7" "f7b6b207d7a6318ea5d33ca2dea51483350d0c26beb986f008d63258b9c112ab" "ed6e47baf355da248c4de8953058234b82c8f838fc85f570f9fe1700e47b9426" "d31c3706f7c1b0520405c796b33f515bc481d2062cbc964f3c36925665999a6d" "454e92bc5f22f690afce91cb6f92a3ccb638c57a89e84c55759fb16dfb2444e4" "cc0ea29f3e80c5c622cea5fd83686dd36963a9abcde5b21dfe6cee653b67d72f" "5a409d7844bfbc12bf6e6cf7a6a6cb9f79945a82dee315ed1778632b5686b6ec" "6c01b5d4faa0f143055e63c9fba8e23e9160f181e54b14b46d56410811edbc9e" default))
  '(package-selected-packages
-   '(orgmode projectile hydra telega evil-collection evil general auctex helpful ivy-rich which-key rainbow-delimiters doom-modeline swiper-helm counsel command-log-mode git ag ivy ef-themes ein)))
+   '(all-the-icons magit counsel-projectile orgmode projectile hydra telega evil-collection evil general auctex helpful ivy-rich which-key rainbow-delimiters doom-modeline swiper-helm counsel command-log-mode git ag ivy ef-themes ein))
+ '(safe-local-variable-values
+   '((projectile-project-run-cmd . "bundle exec jekyll serve"))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -26,6 +28,8 @@
                          ("elpa" . "https://elpa.gnu.org/packages/")
 			 ("melpa-stable" . "https://stable.melpa.org/packages")))
 
+(add-to-list 'package-pinned-packages '(telega . "melpa-stable"))
+
 (package-initialize)
 (unless package-archive-contents
  (package-refresh-contents))
@@ -41,6 +45,12 @@
 
 (column-number-mode)
 (global-display-line-numbers-mode t)
+
+
+;; Load the setup-cygwin.el file
+;; (add-to-list 'load-path "C:/Users/raghav/AppData/Roaming/.emacs.d/cygwin")
+;; (load "use_cygwin.el")
+;; (load "setup-cygwin.el")
 
 ;; Disable Line numbers for some modes
 (dolist (mode '(org-mode-hook
@@ -82,6 +92,7 @@
 (setq python-shell-interpreter "C:/Users/raghav/miniconda3/envs/default/python.exe")
 (setq python-shell-interpreter-args "-i")
 
+
 (use-package doom-modeline
   :ensure t
   :init (doom-modeline-mode 1))
@@ -93,7 +104,7 @@
 
 (windmove-default-keybindings)
 
-(load-theme 'ef-elea-dark t)
+(load-theme 'ef-maris-dark t)
 
 (use-package rainbow-delimiters
   :hook (prog-mode . rainbow-delimiters-mode))
@@ -171,10 +182,18 @@
 (use-package projectile
   :diminish projectile-mode
   :config (projectile-mode)
+  :custom ((projectile-completion-system 'ivy))
   :bind-keymap
   ("C-c p" . projectile-command-map)
   :init
   (when (file-directory-p "C:/raghav/")
     (setq projectile-project-search-path '("C:/raghav/")))
   (setq projectile-switch-project-action #'projectile-dired))
+
+(use-package counsel-projectile
+  :config (counsel-projectile-mode))
+
+(use-package magit
+  :custom
+  (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
 
