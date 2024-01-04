@@ -198,3 +198,5 @@
   :load-path  "~/.emacs.d/manually/telega.el"
   :commands (telega)
   :defer t)
+
+(use-package forge)
