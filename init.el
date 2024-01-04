@@ -190,7 +190,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(org-bullets all-the-icons telega magit auctex ef-themes which-key rainbow-delimiters ivy-rich hydra helpful general evil-collection doom-modeline counsel-projectile command-log-mode)))
+   '(ssh-deploy org-bullets all-the-icons telega magit auctex ef-themes which-key rainbow-delimiters ivy-rich hydra helpful general evil-collection doom-modeline counsel-projectile command-log-mode)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -249,3 +249,12 @@
   :hook (org-mode . org-bullets-mode)
   :custom
   (org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
+
+(defun efs/org-mode-visual-fill ()
+  (setq visual-fill-column-width 100
+        visual-fill-column-center-text t)
+  (visual-fill-column-mode 1))
+
+(use-package visual-fill-column
+  :hook (org-mode . efs/org-mode-visual-fill))
+
