@@ -432,3 +432,7 @@
 ;;   ;; `completion-at-point' is often bound to M-TAB.
 ;;   (setq tab-always-indent 'complete))
 
+(org-babel-do-load-languages
+  'org-babel-load-languages
+  '((emacs-lisp . t)
+    (python . t)))
