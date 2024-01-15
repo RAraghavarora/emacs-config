@@ -1,7 +1,16 @@
-(set-face-attribute 'default nil :height 120)
+;; Basic configuration
 
-;; Make esc quit prompts
-(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+(set-face-attribute 'default nil :height 120) ; Set font height
+(global-set-key (kbd "<escape>") 'keyboard-escape-quit) ; Make esc quit prompts
+(setq inhibit-startup-message t) ; Don't show the start screen
+
+;; Turn off UI elements
+(menu-bar-mode -1)
+(tool-bar-mode -1)
+(scroll-bar-mode t)
+
+(column-number-mode)
+(global-display-line-numbers-mode t)
 
 (require 'package)
 
@@ -20,12 +29,14 @@
 (unless (package-installed-p 'use-package)
    (package-install 'use-package))
 
-
 (require 'use-package)
+
 (setq use-package-always-ensure t)
 
-(column-number-mode)
-(global-display-line-numbers-mode t)
+;; Set theme
+(use-package ef-themes)
+(load-theme 'ef-maris-dark t)
+
 
 ;; Split vertically?
 (setq split-height-threshold nil)
@@ -90,9 +101,6 @@
 
 (windmove-default-keybindings)
 
-(use-package ef-themes)
-(load-theme 'ef-maris-dark t)
-
 (use-package rainbow-delimiters
   :hook (prog-mode . rainbow-delimiters-mode))
 
@@ -133,11 +141,6 @@
    "tm" '(set-mark-command :which-key "set mark"))
 )
 
-(use-package evil-collection
-  :after evil
-  :config
-  (evil-collection-init))
-
 (use-package evil
   :init
   (setq evil-want-integration t)
@@ -149,12 +152,17 @@
   (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
   (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join)
 
-  ;; Use visual line motions even outside of visual-line-mode buffers
   (evil-global-set-key 'motion "j" 'evil-next-visual-line)
   (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
 
   (evil-set-initial-state 'messages-buffer-mode 'normal)
-  (evil-set-initial-state 'dashboard-mode 'normal))
+  (evil-set-initial-state 'dashboard-mode 'normal)
+)
+
+(use-package evil-collection
+  :after evil
+  :config
+  (evil-collection-init))
 
 (use-package hydra)
 
