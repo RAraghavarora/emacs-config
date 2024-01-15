@@ -1,7 +1,7 @@
 ;; Basic configuration
 
 (set-face-attribute 'default nil :height 120) ; Set font height
-(global-set-key (kbd "<escape>") 'keyboard-escape-quit) ; Make esc quit prompts
+;; (global-set-key (kbd "<escape>") 'keyboard-escape-quit) ; Make esc quit prompts
 (setq inhibit-startup-message t) ; Don't show the start screen
 
 ;; Turn off UI elements
@@ -12,18 +12,28 @@
 (column-number-mode)
 (global-display-line-numbers-mode t)
 
-(require 'package)
+(recentf-mode 1); Recently viewed files
 
+;; Save history of minibuffer commands
+(setq history-length 25)
+(savehist-mode 1)
+
+(save-place-mode 1) ; Open files at the same mode where you left it
+
+;; Move customization variables to a separate file and load it
+(setq custom-file (locate-user-emacs-file "custom-vars.el"))
+(load custom-file 'noerror 'nomessage)
+
+;; Set up package managers
+(require 'package)
 (setq package-archives '(("melpa" . "https://melpa.org/packages/")
                          ("org" . "https://orgmode.org/elpa/")
                          ("elpa" . "https://elpa.gnu.org/packages/")
 			 ("melpa-stable" . "https://stable.melpa.org/packages")))
 
-
 (package-initialize)
 (unless package-archive-contents
  (package-refresh-contents))
-
 
 ;; Initialize use-package on non-Linux platforms
 (unless (package-installed-p 'use-package)
@@ -193,23 +203,6 @@
   :custom
   (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
 
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(conda-anaconda-home "C:/Users/raghav/miniconda3")
- '(package-selected-packages
-   '(corfu lsp-pyright visual-fill-column conda forge elpy chess jupyter ssh-deploy org-bullets all-the-icons telega magit auctex ef-themes which-key rainbow-delimiters ivy-rich hydra helpful general evil-collection doom-modeline counsel-projectile command-log-mode))
- '(safe-local-variable-values
-   '((python-shell-virtualenv-root . "C:/Users/raghav/miniconda3/envs/default")
-     (conda-project-env-path . "default"))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
 
 (use-package telega
   :load-path  "~/.emacs.d/manually/telega.el"
