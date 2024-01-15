@@ -24,6 +24,12 @@
 (setq custom-file (locate-user-emacs-file "custom-vars.el"))
 (load custom-file 'noerror 'nomessage)
 
+;; Revert buffers when underlying file has changed
+(global-auto-revert-mode 1)
+
+;; Revert Dired and other buffers
+(setq global-auto-revert-non-file-buffers t)
+
 ;; Set up package managers
 (require 'package)
 (setq package-archives '(("melpa" . "https://melpa.org/packages/")
