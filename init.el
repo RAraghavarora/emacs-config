@@ -452,11 +452,9 @@
   :bind (:map lsp-ui-mode-map
 	      ("C-c i" . lsp-ui-imenu)))
 
-
-(use-package yapfify
-  :ensure t
-  :defer t
-  :hook (python-mode . yapf-mode))
+(use-package blacken
+  :config
+  (add-hook 'python-mode-hook 'blacken-mode))
 
 
 ;; (add-to-list 'safe-local-variable-values
