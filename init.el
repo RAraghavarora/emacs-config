@@ -105,9 +105,6 @@
   :config
   (setq ivy-initial-inputs-alist nil)) ; Don't start searches with ^
 
-(setq python-shell-interpreter "C:/Users/raghav/miniconda3/envs/default/python.exe")
-(setq python-shell-interpreter-args "-i")
-
 
 (use-package doom-modeline
   :ensure t
@@ -118,7 +115,12 @@
 ;; (require 'git)
 (setq ein:jupyter-default-server-command "C:/Users/raghav/miniconda3/envs/default/Scripts/jupyter.exe")
 
+
 (windmove-default-keybindings)
+
+(use-package smartparens
+  :config
+  (add-hook 'prog-mode-hook 'smartparens-mode))
 
 (use-package rainbow-delimiters
   :hook (prog-mode . rainbow-delimiters-mode))
@@ -170,7 +172,7 @@
   (evil-mode 1)
   (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
   (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join)
-
+  
   (evil-global-set-key 'motion "j" 'evil-next-visual-line)
   (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
 
@@ -384,6 +386,7 @@
 (setq tramp-verbose 10)
 
 (use-package conda
+  :ensure t
   :config (progn
             (conda-env-initialize-interactive-shells)
             (conda-env-initialize-eshell)
@@ -395,54 +398,202 @@
 (setq completion-styles '(flex basic partial-completion emacs22))
 (put 'scroll-left 'disabled nil)
 
+(use-package lsp-mode
+  :commands (lsp lsp-deferred)
+  :init
+  (setq lsp-keymap-prefix "C-c l")
+  :config
+  (lsp-enable-which-key-integration t)
+  :hook
+  (python-mode . lsp-deferred)
+  :custom
+  (python-shell-interpreter "C:/Users/raghav/miniconda3/kaggle/python.exe")
+  )
+
+(use-package dap-mode
+  :after lsp-mode
+  :config
+  (dap-auto-configure-mode)
+  )
+
+(setq dap-python-debugger 'debugpy)
+
 (use-package lsp-pyright
   :ensure t
+  :config
+  (setq lsp-clients-python-library-directories '("C:/Users/raghav/miniconda3/pkgs"))
+  (setq lsp-pyright-disable-language-service nil
+	lsp-pyright-disable-organize-imports nil
+	lsp-pyright-auto-import-completions t
+	lsp-pyright-use-library-code-for-types t
+	lsp-pyright-venv-path "C:/Users/raghav/miniconda3/envs")
+
   :hook (python-mode . (lambda ()
                           (require 'lsp-pyright)
-                          (lsp))))  ; or lsp-deferred
+                          (lsp)))  ; or lsp-deferred  
+  )
+
+(use-package treemacs
+  :ensure t
+  :defer t
+  :config
+  (setq treemacs-no-png-images t
+	  treemacs-width 24)
+  :bind ("C-c t" . treemacs))
+
+
+(use-package lsp-ui
+  :ensure t
+  :defer t
+  :config
+  (setq lsp-ui-sideline-enable nil
+	    lsp-ui-doc-delay 2)
+  :hook (lsp-mode . lsp-ui-mode)
+  :bind (:map lsp-ui-mode-map
+	      ("C-c i" . lsp-ui-imenu)))
+
+
+(use-package yapfify
+  :ensure t
+  :defer t
+  :hook (python-mode . yapf-mode))
+
+
+;; (add-to-list 'safe-local-variable-values
+;;              '(Conda- . "lualatex -shell-escape"))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(use-package python
+  :ensure t
+  :config
+  ;; Remove guess indent python message
+  (setq python-indent-guess-indent-offset-verbose nil)
+  ;; Use IPython when available or fall back to regular Python 
+  (cond
+   ((executable-find "ipython")
+    (progn
+      (setq python-shell-buffer-name "IPython")
+      (setq python-shell-interpreter "ipython")
+      (setq python-shell-interpreter-args "-i --simple-prompt")))
+   ((executable-find "python3")
+    (setq python-shell-interpreter "C:/Users/raghav/miniconda3/envs/default/python.exe"))
+   ((executable-find "python2")
+    (setq python-shell-interpreter "python2"))
+   (t
+    (setq python-shell-interpreter "python"))))
+
+(use-package pyvenv
+  :ensure t
+  :defer t
+  :config
+  ;; Setting work on to easily switch between environments
+  (setenv "WORKON_HOME" (expand-file-name "C:/Users/raghav/miniconda3/envs/"))
+  ;; Display virtual envs in the menu bar
+  (setq pyvenv-menu t)
+  ;; Restart the python process when switching environments
+  (add-hook 'pyvenv-post-activate-hooks (lambda ()
+					  (pyvenv-restart-python)))
+  :hook (python-mode . pyvenv-mode))
+
+
+
+(use-package s)
+(use-package dash)
+(use-package editorconfig)
+
+(add-to-list 'load-path  "~/.emacs.d/copilot.el")
+(add-to-list 'load-path "~/.emacs.d/codeium.el")
+(require 'copilot)
+
+(use-package codeium
+  :load-path "~/.emacs.d/codeium.el"
+  :init
+  (add-to-list 'completion-at-point-functions #'codeium-completion-at-point)
+  :config
+  (setq use-dialog-box nil)
+  (setq codeium-mode-line-enable
+	(lambda (api) (not (memq api '(CancelRequest Heartbeat AcceptCompletion)))))
+  (add-to-list 'mode-line-format '(:eval (car-safe codeium-mode-line)) t)
+  (setq codeium-api-enabled
+        (lambda (api)  
+          (memq api '(GetCompletions Heartbeat CancelRequest GetAuthToken RegisterUser auth-redirect AcceptCompletion))))
+  (defun my-codeium/document/text ()
+    (buffer-substring-no-properties (max (- (point) 3000) (point-min)) (min (+ (point) 1000) (point-max))))
+  (defun my-codeium/document/cursor_offset ()
+    (codeium-utf8-byte-length
+     (buffer-substring-no-properties (max (- (point) 3000) (point-min)) (point))))
+  (setq codeium/document/text 'my-codeium/document/text)
+  (setq codeium/document/cursor_offset 'my-codeium/document/cursor_offset))
+
+(add-hook 'prog-mode-hook 'copilot-mode)
+(define-key copilot-completion-map (kbd "<tab>") 'copilot-accept-completion)
+(define-key copilot-completion-map (kbd "TAB") 'copilot-accept-completion)
 
 (set-language-environment "UTF-8")
-
-(use-package corfu
-  ;; Optional customizations
-  :custom
-  (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
-  (corfu-auto t)                 ;; Enable auto completion
-  ;; (corfu-separator ?\s)          ;; Orderless field separator
-  ;; (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
-  ;; (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
-  ;; (corfu-preview-current nil)    ;; Disable current candidate preview
-  ;; (corfu-preselect 'prompt)      ;; Preselect the prompt
-  ;; (corfu-on-exact-match nil)     ;; Configure handling of exact matches
-  ;; (corfu-scroll-margin 5)        ;; Use scroll margin
-
-  ;; Enable Corfu only for certain modes.
-  :hook ((prog-mode . corfu-mode)
-         (shell-mode . corfu-mode)
-         (eshell-mode . corfu-mode))
-
-  ;; Recommended: Enable Corfu globally.  This is recommended since Dabbrev can
-  ;; be used globally (M-/).  See also the customization variable
-  ;; `global-corfu-modes' to exclude certain modes.
-  :init
-  (global-corfu-mode))
-
-;; A few more useful configurations...
-;; (use-package emacs
-;;   :init
-;;   ;; TAB cycle if there are only few candidates
-;;   (setq completion-cycle-threshold 3)
-
-;;   ;; Emacs 28: Hide commands in M-x which do not apply to the current mode.
-;;   ;; Corfu commands are hidden, since they are not supposed to be used via M-x.
-;;   (setq read-extended-command-predicate
-;;         #'command-completion-default-include-p)
-
-;;   ;; Enable indentation+completion using the TAB key.
-;;   ;; `completion-at-point' is often bound to M-TAB.
-;;   (setq tab-always-indent 'complete))
 
 (org-babel-do-load-languages
   'org-babel-load-languages
   '((emacs-lisp . t)
     (python . t)))
+
+;; (use-package company
+;;   :ensure t
+;;   :config
+;;   (setq company-idle-delay 0.1
+;; 	company-minimum-prefix-length 1)
+;;   )
+;; (add-hook 'after-init-hook 'global-company-mode)
+(use-package corfu
+  :pin elpa
+  :ensure t
+  ;; Optional customizations
+  :custom
+  (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
+  (corfu-auto t)                 ;; Enable auto completion
+  (corfu-separator ?\s)          ;; Orderless field separator
+  (corfu-quit-at-boundary t)   ;; Never quit at completion boundary
+  (corfu-quit-no-match t)      ;; Never quit, even if there is no match
+  (corfu-preview-current nil)    ;; Disable current candidate preview
+  (corfu-preselect-first nil)    ;; Disable candidate preselection
+  (corfu-on-exact-match nil)     ;; Configure handling of exact matches
+  (corfu-echo-documentation nil) ;; Disable documentation in the echo area
+  (corfu-scroll-margin 5)        ;; Use scroll margin
+
+  ;; Recommended: Enable Corfu globally.
+  ;; This is recommended since Dabbrev can be used globally (M-/).
+  ;; See also `corfu-excluded-modes'.
+  :init
+  (global-corfu-mode))
+
+;; (use-package corfu
+;;   :init
+;;   (global-corfu-mode))
+
+;; (use-package highlight-indent-guides
+;;   :ensure t
+;;   :hook
+;;   (python-mode . highlight-indent-guides-mode)
+;;   :config
+;;   (set-face-foreground 'highlight-indent-guides-character-face "green")
+;;   (setq highlight-indent-guides-mode 'character))
+
+;; Syntax checking for GNU Emacs
+
+(use-package flycheck
+  :diminish flycheck-mode
+  :ensure t
+  :defer t
+  :custom
+  (flycheck-check-syntax-automatically '(mode-enabled save)) ; Check on save instead of running constantly
+  :hook ((prog-mode-hook text-mode-hook) . flycheck-mode))
+
+(use-package flymake
+  :ensure t
+  :defer t)
+
+(use-package markdown-mode
+    :commands (markdown-mode gfm-mode)
+    :mode (("README\\.md\\'" . gfm-mode)
+           ("\\.md\\'" . markdown-mode)
+           ("\\.markdown\\'" . markdown-mode))
+    :init (setq markdown-command "multimarkdown"))
