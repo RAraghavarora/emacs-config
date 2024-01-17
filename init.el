@@ -53,6 +53,9 @@
 (use-package ef-themes)
 (load-theme 'ef-maris-dark t)
 
+;; Download icons
+(use-package all-the-icons
+  :if (display-graphic-p))
 
 ;; Split vertically?
 (setq split-height-threshold nil)
