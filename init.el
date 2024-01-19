@@ -7,7 +7,7 @@
 ;; Turn off UI elements
 (menu-bar-mode -1)
 (tool-bar-mode -1)
-(scroll-bar-mode t)
+(scroll-bar-mode 0)
 
 (column-number-mode)
 (global-display-line-numbers-mode t)
@@ -18,7 +18,7 @@
 (setq history-length 25)
 (savehist-mode 1)
 
-(save-place-mode 1) ; Open files at the same mode where you left it
+(save-place-mode 1) ; Open files at the same place where you left it
 
 ;; Move customization variables to a separate file and load it
 (setq custom-file (locate-user-emacs-file "custom-vars.el"))
@@ -34,9 +34,7 @@
 (require 'package)
 (setq package-archives '(("melpa" . "https://melpa.org/packages/")
                          ("org" . "https://orgmode.org/elpa/")
-                         ("elpa" . "https://elpa.gnu.org/packages/")
-			 ("melpa-stable" . "https://stable.melpa.org/packages")))
-
+                         ("elpa" . "https://elpa.gnu.org/packages/")))
 (package-initialize)
 (unless package-archive-contents
  (package-refresh-contents))
@@ -111,7 +109,18 @@
   :init (doom-modeline-mode 1))
 
 
-(use-package ein)
+(use-package ein
+  :init
+  (setq ein:worksheet-enable-undo t)
+  )
+(setq debug-on-error t)
+
+(defun force-debug (func &rest args)
+  (condition-case e
+      (apply func args)
+    ((debug error) (signal (car e) (cdr e)))))
+
+(advice-add #'corfu--post-command :around #'force-debug)
 ;; (require 'git)
 (setq ein:jupyter-default-server-command "C:/Users/raghav/miniconda3/envs/default/Scripts/jupyter.exe")
 
@@ -168,6 +177,8 @@
   (setq evil-want-keybinding nil)
   (setq evil-want-C-u-scroll t)
   (setq evil-want-C-i-jump nil)
+  (setq evil-search-module 'evil-search
+	evil-want-C-w-in-emacs-state t) 
   :config
   (evil-mode 1)
   (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
@@ -178,7 +189,16 @@
 
   (evil-set-initial-state 'messages-buffer-mode 'normal)
   (evil-set-initial-state 'dashboard-mode 'normal)
-)
+  )
+
+(use-package evil-escape
+  :init
+  (setq-default evil-escape-key-sequence "jk")
+  :config
+  (evil-escape-mode 1))
+(global-set-key (kbd "C-c C-g") 'evil-escape)
+;; (add-hook 'focus-out-hook 'evil-normal-state)
+
 
 (use-package evil-collection
   :after evil
@@ -334,36 +354,36 @@
              (org-agenda-files org-agenda-files)))))))
 
 
-  (setq org-capture-templates
-    `(("t" "Tasks / Projects")
-      ("tt" "Task" entry (file+olp "C:/raghav/Tasks.org" "Inbox")
-           "* TODO %?\n  %U\n  %a\n  %i" :empty-lines 1)
+  ;; (setq org-capture-templates
+  ;;   `(("t" "Tasks / Projects")
+  ;;     ("tt" "Task" entry (file+olp "C:/raghav/Tasks.org" "Inbox")
+  ;;          "* TODO %?\n  %U\n  %a\n  %i" :empty-lines 1)
 
-      ("j" "Journal Entries")
-      ("jj" "Journal" entry
-           (file+olp+datetree "C:/raghav/Journal.org")
-           "\n* %<%I:%M %p> - Journal :journal:\n\n%?\n\n"
-           ;; ,(dw/read-file-as-string "~/Notes/Templates/Daily.org")
-           :clock-in :clock-resume
-           :empty-lines 1)
-      ("jm" "Meeting" entry
-           (file+olp+datetree "C:/raghav/Journal.org")
-           "* %<%I:%M %p> - %a :meetings:\n\n%?\n\n"
-           :clock-in :clock-resume
-           :empty-lines 1)
+  ;;     ("j" "Journal Entries")
+  ;;     ("jj" "Journal" entry
+  ;;          (file+olp+datetree "C:/raghav/Journal.org")
+  ;;          "\n* %<%I:%M %p> - Journal :journal:\n\n%?\n\n"
+  ;;          ;; ,(dw/read-file-as-string "~/Notes/Templates/Daily.org")
+  ;;          :clock-in :clock-resume
+  ;;          :empty-lines 1)
+  ;;     ("jm" "Meeting" entry
+  ;;          (file+olp+datetree "C:/raghav/Journal.org")
+  ;;          "* %<%I:%M %p> - %a :meetings:\n\n%?\n\n"
+  ;;          :clock-in :clock-resume
+  ;;          :empty-lines 1)
 
-      ("w" "Workflows")
-      ("we" "Checking Email" entry (file+olp+datetree "C:/raghav/Journal.org")
-           "* Checking Email :email:\n\n%?" :clock-in :clock-resume :empty-lines 1)
+  ;;     ("w" "Workflows")
+  ;;     ("we" "Checking Email" entry (file+olp+datetree "C:/raghav/Journal.org")
+  ;;          "* Checking Email :email:\n\n%?" :clock-in :clock-resume :empty-lines 1)
 
-      ("m" "Metrics Capture")
-      ("mw" "Weight" table-line (file+headline "C:/raghav/Metrics.org" "Weight")
-       "| %U | %^{Weight} | %^{Notes} |" :kill-buffer t)))
+  ;;     ("m" "Metrics Capture")
+  ;;     ("mw" "Weight" table-line (file+headline "C:/raghav/Metrics.org" "Weight")
+  ;;      "| %U | %^{Weight} | %^{Notes} |" :kill-buffer t)))
 
-  (define-key global-map (kbd "C-c j")
-	      (lambda () (interactive) (org-capture nil "jj")))
-  (define-key global-map (kbd "C-c t")
-	      (lambda () (interactive) (org-capture nil "tt")))
+  ;; (define-key global-map (kbd "C-c j")
+  ;; 	      (lambda () (interactive) (org-capture nil "jj")))
+  ;; (define-key global-map (kbd "C-c t")
+  ;; 	      (lambda () (interactive) (org-capture nil "tt")))
   
   (ra/org-font-setup)
   )
@@ -434,13 +454,23 @@
   )
 
 (use-package treemacs
+  :hook (treemacs-mode . variable-pitch-mode)
   :ensure t
   :defer t
   :config
   (setq treemacs-no-png-images t
-	  treemacs-width 24)
-  :bind ("C-c t" . treemacs))
+	treemacs-width 24)
+  (when treemacs-python-executable
+      (treemacs-git-commit-diff-mode t))
+  (treemacs-follow-mode -1)
+  
+  :bind ("C-c t" . treemacs-display-current-project-exclusively)
+  )
 
+(use-package treemacs-all-the-icons
+  :ensure t
+  :after treemacs
+  :config (treemacs-load-theme "all-the-icons"))
 
 (use-package lsp-ui
   :ensure t
@@ -448,7 +478,8 @@
   :config
   (setq lsp-ui-sideline-enable nil
 	    lsp-ui-doc-delay 2)
-  :hook (lsp-mode . lsp-ui-mode)
+  :hook
+  (lsp-mode . lsp-ui-mode)
   :bind (:map lsp-ui-mode-map
 	      ("C-c i" . lsp-ui-imenu)))
 
@@ -494,36 +525,20 @@
   :hook (python-mode . pyvenv-mode))
 
 
-
-(use-package s)
-(use-package dash)
-(use-package editorconfig)
+;; These 3 are needed by codeium
+;; (use-package s)
+;; (use-package dash)
+;; (use-package editorconfig)
 
 (add-to-list 'load-path  "~/.emacs.d/copilot.el")
-(add-to-list 'load-path "~/.emacs.d/codeium.el")
+;; (add-to-list 'load-path "~/.emacs.d/codeium.el")
 (require 'copilot)
 
-(use-package codeium
-  :load-path "~/.emacs.d/codeium.el"
-  :init
-  (add-to-list 'completion-at-point-functions #'codeium-completion-at-point)
-  :config
-  (setq use-dialog-box nil)
-  (setq codeium-mode-line-enable
-	(lambda (api) (not (memq api '(CancelRequest Heartbeat AcceptCompletion)))))
-  (add-to-list 'mode-line-format '(:eval (car-safe codeium-mode-line)) t)
-  (setq codeium-api-enabled
-        (lambda (api)  
-          (memq api '(GetCompletions Heartbeat CancelRequest GetAuthToken RegisterUser auth-redirect AcceptCompletion))))
-  (defun my-codeium/document/text ()
-    (buffer-substring-no-properties (max (- (point) 3000) (point-min)) (min (+ (point) 1000) (point-max))))
-  (defun my-codeium/document/cursor_offset ()
-    (codeium-utf8-byte-length
-     (buffer-substring-no-properties (max (- (point) 3000) (point-min)) (point))))
-  (setq codeium/document/text 'my-codeium/document/text)
-  (setq codeium/document/cursor_offset 'my-codeium/document/cursor_offset))
-
 (add-hook 'prog-mode-hook 'copilot-mode)
+(add-hook 'emacs-lisp-mode-hook
+          (lambda ()
+            (setq-local copilot--indent-warning-printed-p t)))
+
 (define-key copilot-completion-map (kbd "<tab>") 'copilot-accept-completion)
 (define-key copilot-completion-map (kbd "TAB") 'copilot-accept-completion)
 
@@ -589,9 +604,14 @@
   :ensure t
   :defer t)
 
-(use-package markdown-mode
-    :commands (markdown-mode gfm-mode)
-    :mode (("README\\.md\\'" . gfm-mode)
-           ("\\.md\\'" . markdown-mode)
-           ("\\.markdown\\'" . markdown-mode))
-    :init (setq markdown-command "multimarkdown"))
+;; (use-package markdown-mode
+;;     :commands (markdown-mode gfm-mode)
+;;     :mode (("README\\.md\\'" . gfm-mode)
+;;            ("\\.md\\'" . markdown-mode)
+;;            ("\\.markdown\\'" . markdown-mode))
+;;     :init (setq markdown-command "multimarkdown"))
+
+
+;; (add-to-list 'org-structure-template-alist '("p" . "src python :session dataset :results output\n"))
+(put 'ein:jupyter-server-command 'safe-local-variable (lambda (_) t))
+(setq lazy-highlight-cleanup t)
