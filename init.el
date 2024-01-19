@@ -30,6 +30,13 @@
 ;; Revert Dired and other buffers
 (setq global-auto-revert-non-file-buffers t)
 
+;; Open init.el file with a keybinding
+(defun my-edit-configuration ()
+  (interactive)
+  (find-file user-init-file))
+
+(global-set-key (kbd "C-c i") 'my-edit-configuration)
+
 ;; Set up package managers
 (require 'package)
 (setq package-archives '(("melpa" . "https://melpa.org/packages/")
