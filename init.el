@@ -77,7 +77,8 @@
 (dolist (mode '(org-mode-hook
 		term-mode-hook
 		shell-mode-hook
-	      eshell-mode-hook))
+	    eshell-mode-hook
+        treemacs))
   (add-hook mode (lambda () (display-line-numbers-mode 0))))
 
 
@@ -178,6 +179,10 @@
    "tm" '(set-mark-command :which-key "set mark"))
 )
 
+;; Disable keymapping C-z for suspending frame
+(put 'suspend-frame 'disabled t)
+(global-unset-key (kbd "C-z"))
+
 (use-package evil
   :init
   (setq evil-want-integration t)
@@ -196,6 +201,16 @@
   (evil-set-initial-state 'messages-buffer-mode 'normal)
   (evil-set-initial-state 'dashboard-mode 'normal)
   )
+
+(setq evil-toggle-key "C-z")
+(evil-mode 1)
+
+;; Make Evil Normal State the Initial State Always
+(setq evil-normal-state-modes
+      (append evil-emacs-state-modes
+              evil-insert-state-modes
+              evil-normal-state-modes
+              evil-motion-state-modes))
 
 (use-package evil-escape
   :init
@@ -232,6 +247,8 @@
   (when (file-directory-p "C:/raghav/")
     (setq projectile-project-search-path '("C:/raghav/")))
   (setq projectile-switch-project-action #'projectile-dired))
+
+(use-package ripgrep)
 
 (use-package counsel-projectile
   :config (counsel-projectile-mode))
@@ -420,7 +437,9 @@
             (setq conda-env-home-directory (expand-file-name "C:/Users/raghav/miniconda3"))
             ))
 
-(setq tab-always-indent 'complete)
+(setq tab-always-indent 'complete) ; Try to indent the current line, else call completion-at-point
+(setq-default indent-tabs-mode nil
+              tab-width 4)
 (setq completion-styles '(flex basic partial-completion emacs22))
 (put 'scroll-left 'disabled nil)
 
@@ -432,6 +451,7 @@
   (lsp-enable-which-key-integration t)
   :hook
   (python-mode . lsp-deferred)
+  (html-mode . lsp-deferred)
   :custom
   (python-shell-interpreter "C:/Users/raghav/miniconda3/kaggle/python.exe")
   )
@@ -465,14 +485,15 @@
   :defer t
   :config
   (setq treemacs-no-png-images t
-	treemacs-width 24)
+	treemacs-width 34)
   (when treemacs-python-executable
       (treemacs-git-commit-diff-mode t))
   (treemacs-follow-mode -1)
   
   :bind ("C-c t" . treemacs-display-current-project-exclusively)
+  ("C-c T" . treemacs)
   )
-
+;; Disable line numbers in treemacs
 (use-package treemacs-all-the-icons
   :ensure t
   :after treemacs
@@ -555,6 +576,11 @@
   '((emacs-lisp . t)
     (python . t)))
 
+(require 'org-tempo)
+(add-to-list 'org-structure-template-alist '("py" . "src python :results output :session"))
+
+;; Do not prompt to confirm evaluation
+(setq org-confirm-babel-evaluate nil)
 ;; (use-package company
 ;;   :ensure t
 ;;   :config
@@ -618,6 +644,28 @@
 ;;     :init (setq markdown-command "multimarkdown"))
 
 
-;; (add-to-list 'org-structure-template-alist '("p" . "src python :session dataset :results output\n"))
 (put 'ein:jupyter-server-command 'safe-local-variable (lambda (_) t))
 (setq lazy-highlight-cleanup t)
+(setq request-curl-options '("--noproxy" "127.0.0.1"))
+(put 'downcase-region 'disabled nil)
+(setq projectile-enable-caching t)
+
+
+(general-override-mode)
+;; Define a key binding for entering Evil normal state with <escape>
+(general-def 'insert
+  [escape] 'evil-normal-state)
+(general-def 'override
+  [escape] 'keyboard-escape-quit)
+;; Adapt `evil-collection-corfu' to the new `corfu--setup' signature (see github.com/minad/corfu/issues/403)
+(with-eval-after-load 'evil-collection-corfu
+  (advice-remove 'corfu--setup #'evil-normalize-keymaps)
+  (advice-add 'corfu--setup :after (lambda (&rest _) (evil-normalize-keymaps))))
+
+(defun todo ()
+  (interactive)
+  (find-file "C:/raghav/todo.org")
+)
+
+(use-package web-mode)
+(add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
