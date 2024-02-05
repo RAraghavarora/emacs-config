@@ -695,3 +695,10 @@
 
 (use-package web-mode)
 (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+(use-package copy-as-format)
+(use-package gptel)
+(gptel-make-gemini "Gemini"
+  :key "AIzaSyCh6kE0nLZx-H5xzGqoHB4KfmjOOh-ZJbI"
+  :stream t)
+(setq-default gptel-model "gemini-pro")
+
