@@ -257,6 +257,7 @@
   :custom
   (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
 
+(define-key global-map (kbd "C-c g") 'magit-status)
 
 (use-package telega
   :load-path  "~/.emacs.d/manually/telega.el"
