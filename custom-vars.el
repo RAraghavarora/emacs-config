@@ -6,7 +6,7 @@
  '(codeium/metadata/api_key "a6705026-aaa8-4693-b087-5f1ed392c83e")
  '(conda-anaconda-home "C:/Users/raghav/miniconda3")
  '(package-selected-packages
-   '(web-mode tidy ripgrep yasnippet treemacs-all-the-icons evil-escape blacken smartparens flycheck yapfify pyvenv dap-mode: codeium jsonrpc dap-python dap-mode copilot editorconfig lsp-pyright corfu highlight-indent-guides company lsp-jedi ein lsp-ui visual-fill-column conda forge elpy chess jupyter ssh-deploy org-bullets all-the-icons telega magit auctex ef-themes which-key rainbow-delimiters ivy-rich hydra helpful general evil-collection doom-modeline counsel-projectile command-log-mode))
+   '(py-isort gptel copy-as-format web-mode tidy ripgrep yasnippet treemacs-all-the-icons evil-escape blacken smartparens flycheck yapfify pyvenv dap-mode: codeium jsonrpc dap-python dap-mode copilot editorconfig lsp-pyright corfu highlight-indent-guides company lsp-jedi ein lsp-ui visual-fill-column conda forge elpy chess jupyter ssh-deploy org-bullets all-the-icons telega magit auctex ef-themes which-key rainbow-delimiters ivy-rich hydra helpful general evil-collection doom-modeline counsel-projectile command-log-mode))
  '(safe-local-variable-values
    '((projectile-project-run-cmd . "bundle exec jekyll serve")
      (python-shell-virtualenv-root . "C:/Users/raghav/miniconda3/envs/kaggle")

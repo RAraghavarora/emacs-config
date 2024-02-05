@@ -459,6 +459,8 @@
 (use-package dap-mode
   :after lsp-mode
   :config
+  (dap-mode t)
+  (dap-ui-mode t)
   (dap-auto-configure-mode)
   )
 
@@ -479,25 +481,34 @@
                           (lsp)))  ; or lsp-deferred  
   )
 
+(use-package py-isort
+  :after python
+  :hook ((python-mode . pyvenv-mode)
+         (before-save . py-isort-before-save)))
+
+
 (use-package treemacs
   :hook (treemacs-mode . variable-pitch-mode)
   :ensure t
   :defer t
   :config
-  (setq treemacs-no-png-images t
-	treemacs-width 34)
+  (setq
+   ;; treemacs-no-png-images t
+        treemacs-width-increment 1
+        treemacs-width 34
+        treemacs-follow-mode -1
+        treemacs-fringe-indicator-mode t
+        treemacs-git-mode 'deferred
+        treemacs-filewatch-mode t
+        ;; treemacs-resize-icons 16
+        )
+  (treemacs-indent-guide-mode 'line)
   (when treemacs-python-executable
-      (treemacs-git-commit-diff-mode t))
-  (treemacs-follow-mode -1)
-  
-  :bind ("C-c t" . treemacs-display-current-project-exclusively)
-  ("C-c T" . treemacs)
-  )
-;; Disable line numbers in treemacs
-(use-package treemacs-all-the-icons
-  :ensure t
-  :after treemacs
-  :config (treemacs-load-theme "all-the-icons"))
+    (treemacs-git-commit-diff-mode t))
+  :bind
+  (("C-c t" . treemacs-display-current-project-exclusively)
+   ("C-c T" . treemacs)))
+
 
 (use-package lsp-ui
   :ensure t
@@ -508,9 +519,10 @@
   :hook
   (lsp-mode . lsp-ui-mode)
   :bind (:map lsp-ui-mode-map
-	      ("C-c i" . lsp-ui-imenu)))
+	          ("C-c i" . lsp-ui-imenu)))
 
 (use-package blacken
+  :delight
   :config
   (add-hook 'python-mode-hook 'blacken-mode))
 
@@ -520,6 +532,19 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package python
+  :delight "π "
+  :bind (("M-[" . python-nav-backward-block)
+         ("M-]" . python-nav-forward-block))
+  :preface
+  (defun python-remove-unused-imports()
+    "Removes unused imports and unused variables with autoflake."
+    (interactive)
+    (if (executable-find "autoflake")
+        (progn
+          (shell-command (format "autoflake --remove-all-unused-imports -i %s"
+                                 (shell-quote-argument (buffer-file-name))))
+          (revert-buffer t t t))
+      (warn "python-mode: Cannot find autoflake executable.")))
   :ensure t
   :config
   ;; Remove guess indent python message
