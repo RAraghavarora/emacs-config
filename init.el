@@ -53,10 +53,13 @@
 (require 'use-package)
 
 (setq use-package-always-ensure t)
+(setq use-package-verbose t)
 
 ;; Set theme
 (use-package ef-themes)
 (load-theme 'ef-maris-dark t)
+
+(use-package no-littering)
 
 ;; Download icons
 (use-package all-the-icons
@@ -74,6 +77,17 @@
 ;; (load "setup-cygwin.el")
 
 ;; Disable Line numbers for some modes
+
+(defun ra/display-startup-time ()
+  (message "Emacs loaded in %s with %d garbage collections"
+           (format "%.2f seconds"
+                   (float-time
+                    (time-subtract after-init-time before-init-time)))
+           gcs-done))
+
+(add-hook 'emacs-startup-hook #'ra/display-startup-time)
+
+
 (dolist (mode '(org-mode-hook
 		term-mode-hook
 		shell-mode-hook
@@ -81,107 +95,23 @@
         treemacs))
   (add-hook mode (lambda () (display-line-numbers-mode 0))))
 
-
-(use-package command-log-mode)
-
-(use-package ivy
-  :diminish
-  :bind (("C-s" . swiper)
-         :map ivy-minibuffer-map
-         ("TAB" . ivy-alt-done)	
-         ("C-l" . ivy-alt-done)
-         ("C-j" . ivy-next-line)
-         ("C-k" . ivy-previous-line)
-         :map ivy-switch-buffer-map
-         ("C-k" . ivy-previous-line)
-         ("C-l" . ivy-done)
-         ("C-d" . ivy-switch-buffer-kill)
-         :map ivy-reverse-i-search-map
-         ("C-k" . ivy-previous-line)
-         ("C-d" . ivy-reverse-i-search-kill))
-  :config
-  (ivy-mode 1))
-
-(use-package counsel
-  :bind (("M-x" . counsel-M-x)
-	 ("C-x b" . counsel-ibuffer)
-	 ("C-x C-f" . counsel-find-file)
-	 :map minibuffer-local-map
-	 ("C-r" . 'counsel-minibuffer-history))
-  :config
-  (setq ivy-initial-inputs-alist nil)) ; Don't start searches with ^
-
-
-(use-package doom-modeline
-  :ensure t
-  :init (doom-modeline-mode 1))
-
-
-(use-package ein
-  :init
-  (setq ein:worksheet-enable-undo t)
-  )
-(setq debug-on-error t)
-
-(defun force-debug (func &rest args)
-  (condition-case e
-      (apply func args)
-    ((debug error) (signal (car e) (cdr e)))))
-
-(advice-add #'corfu--post-command :around #'force-debug)
-;; (require 'git)
-(setq ein:jupyter-default-server-command "C:/Users/raghav/miniconda3/envs/default/Scripts/jupyter.exe")
-
-
-(windmove-default-keybindings)
-
-(use-package smartparens
-  :config
-  (add-hook 'prog-mode-hook 'smartparens-mode))
-
-(use-package rainbow-delimiters
-  :hook (prog-mode . rainbow-delimiters-mode))
-
-(use-package which-key
-  :init (which-key-mode)
-  :diminish which-key-mode
-  :config
-  (setq which-key-idle-delay 0.3))
-
-(use-package ivy-rich
-  :init
-  (ivy-rich-mode 1))
-
-(use-package helpful
-  :custom
-  (counsel-describe-function-function #'helpful-callable)
-  (counsel-describe-variable-function #'helpful-variable)
-  :bind
-  ([remap describe-function] . counsel-describe-function)
-  ([remap describe-command] . helpful-command)
-  ([remap describe-variable] . counsel-describe-variable)
-  ([remap describe-key] . helpful-key))
-
-;; (use-package tex
-;; :ensure auctex)
-;; (setq-default TeX-engine 'xetex)
-
 ;; Defining personal namespaces 
 (use-package general
+  :after evil
   :config
   (general-create-definer rune/leader-keys
     :keymaps '(normal insert visual emacs)
     :prefix "SPC"
     :global-prefix "C-SPC")
   (rune/leader-keys
-   "t" '(:ignore t :which-key "toggles")
-   "tt" '(counsel-load-theme :which-key "choose theme")
-   "tm" '(set-mark-command :which-key "set mark"))
-)
+    "t" '(:ignore t :which-key "toggles")
+    "tt" '(counsel-load-theme :which-key "choose theme")
+    "tm" '(set-mark-command :which-key "set mark"))
+  )
 
 ;; Disable keymapping C-z for suspending frame
 (put 'suspend-frame 'disabled t)
-(global-unset-key (kbd "C-z"))
+;; (global-unset-key (kbd "C-z"))
 
 (use-package evil
   :init
@@ -226,7 +156,105 @@
   :config
   (evil-collection-init))
 
-(use-package hydra)
+(use-package which-key
+  :defer 0
+  :diminish which-key-mode
+  :config
+  (which-key-mode)
+  (setq which-key-idle-delay 0.3))
+
+(use-package ivy
+  :diminish
+  :bind (("C-s" . swiper)
+         :map ivy-minibuffer-map
+         ("TAB" . ivy-alt-done)	
+         ("C-l" . ivy-alt-done)
+         ("C-j" . ivy-next-line)
+         ("C-k" . ivy-previous-line)
+         :map ivy-switch-buffer-map
+         ("C-k" . ivy-previous-line)
+         ("C-l" . ivy-done)
+         ("C-d" . ivy-switch-buffer-kill)
+         :map ivy-reverse-i-search-map
+         ("C-k" . ivy-previous-line)
+         ("C-d" . ivy-reverse-i-search-kill))
+  :config
+  (ivy-mode 1))
+
+(use-package ivy-rich
+  :after ivy
+  :init
+  (ivy-rich-mode 1))
+
+(use-package counsel
+  :bind (("M-x" . counsel-M-x)
+	 ("C-x b" . counsel-ibuffer)
+	 ("C-x C-f" . counsel-find-file)
+	 :map minibuffer-local-map
+	 ("C-r" . 'counsel-minibuffer-history))
+  :config
+  (setq ivy-initial-inputs-alist nil)) ; Don't start searches with ^
+
+;; To show better results in ivy based on previous use
+(use-package ivy-prescient
+  :after counsel
+  :custom
+  (ivy-prescient-enable-filtering nil)
+  :config
+  (ivy-prescient-mode 1)
+  (prescient-persist-mode 1) 
+  )
+
+(use-package doom-modeline
+  :ensure t
+  :init (doom-modeline-mode 1))
+
+
+(use-package ein
+  :hook (ein:notebooklist-mode . auto-revert-mode)
+  :init
+  (setq ein:worksheet-enable-undo t)
+  )
+(setq debug-on-error t)
+
+(defun force-debug (func &rest args)
+  (condition-case e
+      (apply func args)
+    ((debug error) (signal (car e) (cdr e)))))
+
+(advice-add #'corfu--post-command :around #'force-debug)
+;; (require 'git)
+(setq ein:jupyter-default-server-command "C:/Users/raghav/miniconda3/envs/default/Scripts/jupyter.exe")
+
+
+(windmove-default-keybindings)
+
+(use-package smartparens
+  :config
+  (add-hook 'prog-mode-hook 'smartparens-mode))
+
+(use-package rainbow-delimiters
+  :hook (prog-mode . rainbow-delimiters-mode))
+
+;; Better help buffer for emacs
+(use-package helpful
+  :commands (helpful-callable helpful-variable)
+  :custom
+  (counsel-describe-function-function #'helpful-callable)
+  (counsel-describe-variable-function #'helpful-variable)
+  :bind
+  ([remap describe-function] . counsel-describe-function)
+  ([remap describe-command] . helpful-command)
+  ([remap describe-variable] . counsel-describe-variable)
+  ([remap describe-key] . helpful-key))
+
+;; (use-package tex
+;; :ensure auctex)
+;; (setq-default TeX-engine 'xetex)
+
+
+(use-package hydra
+  :defer t)
 
 (defhydra hydra-text-scale (:timeout 4)
   "scale text"
@@ -251,20 +279,18 @@
 (use-package ripgrep)
 
 (use-package counsel-projectile
+  :after projectile
   :config (counsel-projectile-mode))
 
 (use-package magit
+  :commands (magit-status)
   :custom
   (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
 
 (define-key global-map (kbd "C-c g") 'magit-status)
 
-(use-package telega
-  :load-path  "~/.emacs.d/manually/telega.el"
-  :commands (telega)
-  :defer t)
-
-(use-package forge)
+(use-package forge
+  :after magit)
 
 (defun ra/org-mode-setup ()
   (org-indent-mode)
@@ -298,6 +324,7 @@
   (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch))
 
 (use-package org
+  :pin org
   :hook (org-mode . ra/org-mode-setup)
   :config
   (setq org-ellipsis " ▾")
@@ -430,6 +457,7 @@
 (setq tramp-verbose 10)
 
 (use-package conda
+  :after python
   :ensure t
   :config (progn
             (conda-env-initialize-interactive-shells)
@@ -458,16 +486,23 @@
   )
 
 (use-package dap-mode
+  :commands dap-debug
   :after lsp-mode
   :config
+  (require 'dap-python)
   (dap-mode t)
   (dap-ui-mode t)
   (dap-auto-configure-mode)
+  (general-define-key
+   :keymaps 'python-mode-map
+   :prefix lsp-keymap-prefix
+   "d" '(dap-hydra t :wk "debugger"))
   )
 
 (setq dap-python-debugger 'debugpy)
 
 (use-package lsp-pyright
+  :after lsp-mode
   :ensure t
   :config
   (setq lsp-clients-python-library-directories '("C:/Users/raghav/miniconda3/pkgs"))
@@ -482,11 +517,21 @@
                           (lsp)))  ; or lsp-deferred  
   )
 
+(use-package yasnippet
+  :after lsp-mode)
+
 (use-package py-isort
   :after python
   :hook ((python-mode . pyvenv-mode)
          (before-save . py-isort-before-save)))
 
+(defun my-isort ()
+  "When in Python Mode, call isort on save"
+  (when (eq major-mode 'python-mode)
+    (shell-command-to-string (format "isort %s" buffer-file-name))))
+
+;; Run on file save
+(add-hook 'after-save-hook 'my-isort)
 
 (use-package treemacs
   :hook (treemacs-mode . variable-pitch-mode)
@@ -510,6 +555,8 @@
   (("C-c t" . treemacs-display-current-project-exclusively)
    ("C-c T" . treemacs)))
 
+(use-package lsp-treemacs
+  :after lsp)
 
 (use-package lsp-ui
   :ensure t
@@ -522,7 +569,12 @@
   :bind (:map lsp-ui-mode-map
 	          ("C-c i" . lsp-ui-imenu)))
 
+(use-package lsp-ivy
+  :ensure t
+  :after lsp)
+
 (use-package blacken
+  :after python
   :delight
   :config
   (add-hook 'python-mode-hook 'blacken-mode))
@@ -533,6 +585,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package python
+  :after lsp-mode
   :delight "π "
   :bind (("M-[" . python-nav-backward-block)
          ("M-]" . python-nav-forward-block))
@@ -548,6 +601,7 @@
       (warn "python-mode: Cannot find autoflake executable.")))
   :ensure t
   :config
+  (require 'dap-python)
   ;; Remove guess indent python message
   (setq python-indent-guess-indent-offset-verbose nil)
   ;; Use IPython when available or fall back to regular Python 
@@ -562,9 +616,14 @@
    ((executable-find "python2")
     (setq python-shell-interpreter "python2"))
    (t
-    (setq python-shell-interpreter "python"))))
+    (setq python-shell-interpreter "python")))
+
+  :custom
+  (dap-python-debugger 'debugpy)
+  )
 
 (use-package pyvenv
+  :after python
   :ensure t
   :defer t
   :config
@@ -585,25 +644,35 @@
 
 (add-to-list 'load-path  "~/.emacs.d/copilot.el")
 ;; (add-to-list 'load-path "~/.emacs.d/codeium.el")
-(require 'copilot)
+(defun load-copilot-in-prog-mode ()
+  (require 'copilot))
 
-(add-hook 'prog-mode-hook 'copilot-mode)
-(add-hook 'emacs-lisp-mode-hook
-          (lambda ()
-            (setq-local copilot--indent-warning-printed-p t)))
+(add-hook 'prog-mode-hook 'load-copilot-in-prog-mode)
 
-(define-key copilot-completion-map (kbd "<tab>") 'copilot-accept-completion)
-(define-key copilot-completion-map (kbd "TAB") 'copilot-accept-completion)
+(defun ra/copilot-setup ()
+  "Setup Copilot in prog-mode."
+  (require 'copilot)
+  (setq-local copilot--indent-warning-printed-p t)
+  (add-hook 'prog-mode-hook 'copilot-mode)
+
+  (define-key copilot-completion-map (kbd "<tab>") 'copilot-accept-completion)
+  (define-key copilot-completion-map (kbd "TAB") 'copilot-accept-completion)
+)
+
+(add-hook 'prog-mode-hook 'ra/copilot-setup)
 
 (set-language-environment "UTF-8")
 
-(org-babel-do-load-languages
-  'org-babel-load-languages
-  '((emacs-lisp . t)
-    (python . t)))
+(with-eval-after-load 'org
+      (org-babel-do-load-languages
+       'org-babel-load-languages
+       '((emacs-lisp . t)
+         (python . t)))
 
-(require 'org-tempo)
-(add-to-list 'org-structure-template-alist '("py" . "src python :results output :session"))
+      (require 'org-tempo)
+      (add-to-list 'org-structure-template-alist '("py" . "src python :results output :session"))
+      )
+
 
 ;; Do not prompt to confirm evaluation
 (setq org-confirm-babel-evaluate nil)
@@ -615,6 +684,7 @@
 ;;   )
 ;; (add-hook 'after-init-hook 'global-company-mode)
 (use-package corfu
+  :hook lsp-mode
   :pin elpa
   :ensure t
   ;; Optional customizations
@@ -636,10 +706,6 @@
   :init
   (global-corfu-mode))
 
-;; (use-package corfu
-;;   :init
-;;   (global-corfu-mode))
-
 ;; (use-package highlight-indent-guides
 ;;   :ensure t
 ;;   :hook
@@ -658,16 +724,17 @@
   (flycheck-check-syntax-automatically '(mode-enabled save)) ; Check on save instead of running constantly
   :hook ((prog-mode-hook text-mode-hook) . flycheck-mode))
 
+
 (use-package flymake
   :ensure t
   :defer t)
 
-;; (use-package markdown-mode
-;;     :commands (markdown-mode gfm-mode)
-;;     :mode (("README\\.md\\'" . gfm-mode)
-;;            ("\\.md\\'" . markdown-mode)
-;;            ("\\.markdown\\'" . markdown-mode))
-;;     :init (setq markdown-command "multimarkdown"))
+(use-package markdown-mode
+    :commands (markdown-mode gfm-mode)
+    :mode (("README\\.md\\'" . gfm-mode)
+           ("\\.md\\'" . markdown-mode)
+           ("\\.markdown\\'" . markdown-mode))
+    :init (setq markdown-command "multimarkdown"))
 
 
 (put 'ein:jupyter-server-command 'safe-local-variable (lambda (_) t))
@@ -696,9 +763,10 @@
 (use-package web-mode)
 (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
 (use-package copy-as-format)
-(use-package gptel)
-(gptel-make-gemini "Gemini"
-  :key "AIzaSyCh6kE0nLZx-H5xzGqoHB4KfmjOOh-ZJbI"
-  :stream t)
-(setq-default gptel-model "gemini-pro")
 
+;; (use-package gptel)
+;; (gptel-make-gemini "Gemini"
+;;   :key "AIzaSyCh6kE0nLZx-H5xzGqoHB4KfmjOOh-ZJbI"
+;;   :stream t)
+;; (setq-default gptel-model "gemini-pro")
+;; (add-hook 'gptel-post-stream-hook 'gptel-auto-scroll)
