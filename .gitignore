@@ -6,3 +6,4 @@
 !.gitignore
 !init.el
 !custom-vars.el
+!copilot.el/
