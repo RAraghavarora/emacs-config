@@ -636,13 +636,16 @@
 					  (pyvenv-restart-python)))
   :hook (python-mode . pyvenv-mode))
 
-
+(add-to-list 'load-path "~/.emacs.d/lisp")
+(require 'editorconfig)
+(editorconfig-mode 1)
 ;; These 3 are needed by codeium
 ;; (use-package s)
 ;; (use-package dash)
 ;; (use-package editorconfig)
 
 (add-to-list 'load-path  "~/.emacs.d/copilot.el")
+;; (add-to-list 'load-path  "~/.emacs.d/editorconfig-emacs")
 ;; (add-to-list 'load-path "~/.emacs.d/codeium.el")
 (defun load-copilot-in-prog-mode ()
   (require 'copilot))
@@ -770,3 +773,10 @@
 ;;   :stream t)
 ;; (setq-default gptel-model "gemini-pro")
 ;; (add-hook 'gptel-post-stream-hook 'gptel-auto-scroll)
+
+
+(use-package spaceline)
+
+(use-package spaceline-all-the-icons 
+  :after spaceline
+  :config (spaceline-all-the-icons-theme))
