@@ -57,7 +57,7 @@
 
 ;; Set theme
 (use-package ef-themes)
-(load-theme 'ef-maris-dark t)
+(load-theme 'ef-rosa t)
 
 (use-package no-littering)
 
@@ -464,6 +464,7 @@
             (conda-env-initialize-eshell)
             (conda-env-autoactivate-mode t)
             (setq conda-env-home-directory (expand-file-name "C:/Users/raghav/miniconda3"))
+            (setq-default mode-line-format (cons mode-line-format '(:exec conda-env-current-name)))
             ))
 
 (setq tab-always-indent 'complete) ; Try to indent the current line, else call completion-at-point
