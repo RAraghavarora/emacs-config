@@ -781,3 +781,65 @@
 (use-package spaceline-all-the-icons 
   :after spaceline
   :config (spaceline-all-the-icons-theme))
+
+(use-package obsidian
+  :ensure t
+  :demand t
+  :config
+  (obsidian-specify-path "~/Obsidian/")
+  (global-obsidian-mode t)
+  :custom
+  ;; This directory will be used for `obsidian-capture' if set.
+  (obsidian-inbox-directory "Inbox")
+  ;; Create missing files in inbox? - when clicking on a wiki link
+  ;; t: in inbox, nil: next to the file with the link
+  ;; default: t
+  ;(obsidian-wiki-link-create-file-in-inbox nil)
+  ;; The directory for daily notes (file name is YYYY-MM-DD.md)
+  (obsidian-daily-notes-directory "Daily Notes")
+  ;; Directory of note templates, unset (nil) by default
+  ;(obsidian-templates-directory "Templates")
+  ;; Daily Note template name - requires a template directory. Default: Daily Note Template.md
+  ;(setq obsidian-daily-note-template "Daily Note Template.md")
+  :bind (:map obsidian-mode-map
+  ;; Replace C-c C-o with Obsidian.el's implementation. It's ok to use another key binding.
+  ("C-c C-o" . obsidian-follow-link-at-point)
+  ;; Jump to backlinks
+  ("C-c C-b" . obsidian-backlink-jump)
+  ;; If you prefer you can use `obsidian-insert-link'
+  ("C-c C-l" . obsidian-insert-wikilink)))
+
+(use-package auctex
+  :straight t
+  :defer t
+  :mode
+  ("\\.tex\\'" . latex-mode)
+  ("\\.ltx\\'" . latex-mode)
+  :commands
+  (latex-mode
+   LaTeX-mode
+   TeX-mode)
+  :hook (LaTeX-mode .
+                    (lambda ()
+                        (turn-on-reftex)
+                        (LaTeX-preview-setup)
+                        (flyspell-mode)
+                        (outline-minor-mode)
+                        (hs-minor-mode)
+                      )
+                    )
+  :init
+  (setq-default TeX-master nil)
+  ;; :config
+  :custom
+  (TeX-auto-save t)
+  (TeX-parse-self t)
+  (TeX-save-query nil)
+  (TeX-PDF-mode t)
+  (LaTeX-beamer-item-overlay-flag nil)
+  (TeX-PDF-mode t)
+  (TeX-quote-after-quote nil)
+  (TeX-open-quote "\"")
+  (TeX-close-quote "\"")
+  (TeX-insert-macro-default-style 'mandatory-args-only)
+  )
