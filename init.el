@@ -843,3 +843,8 @@
   (TeX-close-quote "\"")
   (TeX-insert-macro-default-style 'mandatory-args-only)
   )
+
+(use-package undo-tree
+  :ensure t
+  :init
+  (global-undo-tree-mode 1))
