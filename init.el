@@ -224,7 +224,7 @@
 
 (advice-add #'corfu--post-command :around #'force-debug)
 ;; (require 'git)
-(setq ein:jupyter-default-server-command "C:/Users/raghav/miniconda3/envs/default/Scripts/jupyter.exe")
+(setq ein:jupyter-default-server-command "~/miniconda3/envs/default/Scripts/jupyter.exe")
 
 
 (windmove-default-keybindings)
@@ -463,7 +463,7 @@
             (conda-env-initialize-interactive-shells)
             (conda-env-initialize-eshell)
             (conda-env-autoactivate-mode t)
-            (setq conda-env-home-directory (expand-file-name "C:/Users/raghav/miniconda3"))
+            (setq conda-env-home-directory (expand-file-name "~/miniconda3"))
             (setq-default mode-line-format (cons mode-line-format '(:exec conda-env-current-name)))
             ))
 
@@ -483,7 +483,7 @@
   (python-mode . lsp-deferred)
   (html-mode . lsp-deferred)
   :custom
-  (python-shell-interpreter "C:/Users/raghav/miniconda3/kaggle/python.exe")
+  (python-shell-interpreter "~/miniconda3/default/python.exe")
   )
 
 (use-package dap-mode
@@ -506,12 +506,12 @@
   :after lsp-mode
   :ensure t
   :config
-  (setq lsp-clients-python-library-directories '("C:/Users/raghav/miniconda3/pkgs"))
+  (setq lsp-clients-python-library-directories '("~/miniconda3/pkgs"))
   (setq lsp-pyright-disable-language-service nil
 	lsp-pyright-disable-organize-imports nil
 	lsp-pyright-auto-import-completions t
 	lsp-pyright-use-library-code-for-types t
-	lsp-pyright-venv-path "C:/Users/raghav/miniconda3/envs")
+	lsp-pyright-venv-path "~/miniconda3/envs")
 
   :hook (python-mode . (lambda ()
                           (require 'lsp-pyright)
@@ -613,7 +613,7 @@
       (setq python-shell-interpreter "ipython")
       (setq python-shell-interpreter-args "-i --simple-prompt")))
    ((executable-find "python3")
-    (setq python-shell-interpreter "C:/Users/raghav/miniconda3/envs/default/python.exe"))
+    (setq python-shell-interpreter "~/miniconda3/envs/default/python.exe"))
    ((executable-find "python2")
     (setq python-shell-interpreter "python2"))
    (t
@@ -629,7 +629,7 @@
   :defer t
   :config
   ;; Setting work on to easily switch between environments
-  (setenv "WORKON_HOME" (expand-file-name "C:/Users/raghav/miniconda3/envs/"))
+  (setenv "WORKON_HOME" (expand-file-name "~/miniconda3/envs/"))
   ;; Display virtual envs in the menu bar
   (setq pyvenv-menu t)
   ;; Restart the python process when switching environments
@@ -782,32 +782,32 @@
   :after spaceline
   :config (spaceline-all-the-icons-theme))
 
-(use-package obsidian
-  :ensure t
-  :demand t
-  :config
-  (obsidian-specify-path "~/Obsidian/")
-  (global-obsidian-mode t)
-  :custom
-  ;; This directory will be used for `obsidian-capture' if set.
-  (obsidian-inbox-directory "Inbox")
-  ;; Create missing files in inbox? - when clicking on a wiki link
-  ;; t: in inbox, nil: next to the file with the link
-  ;; default: t
-  ;(obsidian-wiki-link-create-file-in-inbox nil)
-  ;; The directory for daily notes (file name is YYYY-MM-DD.md)
-  (obsidian-daily-notes-directory "Daily Notes")
-  ;; Directory of note templates, unset (nil) by default
-  ;(obsidian-templates-directory "Templates")
-  ;; Daily Note template name - requires a template directory. Default: Daily Note Template.md
-  ;(setq obsidian-daily-note-template "Daily Note Template.md")
-  :bind (:map obsidian-mode-map
-  ;; Replace C-c C-o with Obsidian.el's implementation. It's ok to use another key binding.
-  ("C-c C-o" . obsidian-follow-link-at-point)
-  ;; Jump to backlinks
-  ("C-c C-b" . obsidian-backlink-jump)
-  ;; If you prefer you can use `obsidian-insert-link'
-  ("C-c C-l" . obsidian-insert-wikilink)))
+;; (use-package obsidian
+;;   :ensure t
+;;   :demand t
+;;   :config
+;;   (obsidian-specify-path "~/Obsidian/")
+;;   (global-obsidian-mode t)
+;;   :custom
+;;   ;; This directory will be used for `obsidian-capture' if set.
+;;   (obsidian-inbox-directory "Inbox")
+;;   ;; Create missing files in inbox? - when clicking on a wiki link
+;;   ;; t: in inbox, nil: next to the file with the link
+;;   ;; default: t
+;;   ;(obsidian-wiki-link-create-file-in-inbox nil)
+;;   ;; The directory for daily notes (file name is YYYY-MM-DD.md)
+;;   (obsidian-daily-notes-directory "Daily Notes")
+;;   ;; Directory of note templates, unset (nil) by default
+;;   ;(obsidian-templates-directory "Templates")
+;;   ;; Daily Note template name - requires a template directory. Default: Daily Note Template.md
+;;   ;(setq obsidian-daily-note-template "Daily Note Template.md")
+;;   :bind (:map obsidian-mode-map
+;;   ;; Replace C-c C-o with Obsidian.el's implementation. It's ok to use another key binding.
+;;   ("C-c C-o" . obsidian-follow-link-at-point)
+;;   ;; Jump to backlinks
+;;   ("C-c C-b" . obsidian-backlink-jump)
+;;   ;; If you prefer you can use `obsidian-insert-link'
+;;   ("C-c C-l" . obsidian-insert-wikilink)))
 
 (use-package auctex
   :straight t
