@@ -1,6 +1,9 @@
 ;; Basic configuration
 
-(set-face-attribute 'default nil :height 120) ; Set font height
+;; (set-face-attribute 'default nil :height 120) ; Set font height
+(when (display-graphic-p)
+  ;; Replace '12' with your desired font size
+  (set-frame-font "SpaceMonoNerdFont-14" nil t))
 ;; (global-set-key (kbd "<escape>") 'keyboard-escape-quit) ; Make esc quit prompts
 (setq inhibit-startup-message t) ; Don't show the start screen
 
@@ -64,7 +67,13 @@
 ;; Download icons
 (use-package all-the-icons
   :if (display-graphic-p))
-
+(use-package nerd-icons
+  :custom
+  ;; The Nerd Font you want to use in GUI
+  ;; "Symbols Nerd Font Mono" is the default and is recommended
+  ;; but you can use any other Nerd Font if you want
+  (nerd-icons-font-family "SpaceMono Nerd Font Mono")
+  )
 ;; Split vertically?
 (setq split-height-threshold nil)
 (setq split-width-threshold 0)
@@ -222,9 +231,9 @@
       (apply func args)
     ((debug error) (signal (car e) (cdr e)))))
 
-(advice-add #'corfu--post-command :around #'force-debug)
+;; (advice-add #'corfu--post-command :around #'force-debug)
 ;; (require 'git)
-(setq ein:jupyter-default-server-command "~/miniconda3/envs/default/Scripts/jupyter.exe")
+(setq ein:jupyter-default-server-command "~/miniconda3/envs/default/Scripts/jupyter")
 
 
 (windmove-default-keybindings)
@@ -483,7 +492,7 @@
   (python-mode . lsp-deferred)
   (html-mode . lsp-deferred)
   :custom
-  (python-shell-interpreter "~/miniconda3/default/python.exe")
+  (python-shell-interpreter "~/miniconda3/default/bin/python")
   )
 
 (use-package dap-mode
@@ -613,7 +622,7 @@
       (setq python-shell-interpreter "ipython")
       (setq python-shell-interpreter-args "-i --simple-prompt")))
    ((executable-find "python3")
-    (setq python-shell-interpreter "~/miniconda3/envs/default/python.exe"))
+    (setq python-shell-interpreter "~/miniconda3/envs/default/bin/python"))
    ((executable-find "python2")
     (setq python-shell-interpreter "python2"))
    (t
@@ -693,6 +702,7 @@
   :ensure t
   ;; Optional customizations
   :custom
+  (completion--cycle-threshold t) ;; Always show candidates in menu
   (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
   (corfu-auto t)                 ;; Enable auto completion
   (corfu-separator ?\s)          ;; Orderless field separator
@@ -708,7 +718,16 @@
   ;; This is recommended since Dabbrev can be used globally (M-/).
   ;; See also `corfu-excluded-modes'.
   :init
-  (global-corfu-mode))
+  (global-corfu-mode)
+  :bind (:map corfu-map
+                   ("<escape>". corfu-quit)
+                   ("<return>" . corfu-insert)
+                   ("C-h" . corfu-show-documentation)
+                   ("M-l" . 'corfu-show-location)
+                   ("TAB" . corfu-next)
+                   ([tab] . corfu-next)
+                   ("S-TAB" . corfu-previous)
+                   ([backtab] . corfu-previous)))
 
 ;; (use-package highlight-indent-guides
 ;;   :ensure t
@@ -809,42 +828,53 @@
 ;;   ;; If you prefer you can use `obsidian-insert-link'
 ;;   ("C-c C-l" . obsidian-insert-wikilink)))
 
-(use-package auctex
-  :straight t
-  :defer t
-  :mode
-  ("\\.tex\\'" . latex-mode)
-  ("\\.ltx\\'" . latex-mode)
-  :commands
-  (latex-mode
-   LaTeX-mode
-   TeX-mode)
-  :hook (LaTeX-mode .
-                    (lambda ()
-                        (turn-on-reftex)
-                        (LaTeX-preview-setup)
-                        (flyspell-mode)
-                        (outline-minor-mode)
-                        (hs-minor-mode)
-                      )
-                    )
-  :init
-  (setq-default TeX-master nil)
-  ;; :config
-  :custom
-  (TeX-auto-save t)
-  (TeX-parse-self t)
-  (TeX-save-query nil)
-  (TeX-PDF-mode t)
-  (LaTeX-beamer-item-overlay-flag nil)
-  (TeX-PDF-mode t)
-  (TeX-quote-after-quote nil)
-  (TeX-open-quote "\"")
-  (TeX-close-quote "\"")
-  (TeX-insert-macro-default-style 'mandatory-args-only)
-  )
+;; (use-package auctex
+;;   :straight t
+;;   :defer t
+;;   :mode
+;;   ("\\.tex\\'" . latex-mode)
+
+;;   ("\\.ltx\\'" . latex-mode)
+
+;;   :commands
+;;   (latex-mode
+;;    LaTeX-mode
+;;    TeX-mode)
+;;   :hook (LaTeX-mode .
+;;                     (lambda ()
+;;                         (turn-on-reftex)
+;;                         (LaTeX-preview-setup)
+;;                         (flyspell-mode)
+;;                         (outline-minor-mode)
+;;                         (hs-minor-mode)
+;;                       )
+;;                     )
+;;   :init
+;;   (setq-default TeX-master nil)
+;;   ;; :config
+;;   :custom
+;;   (TeX-auto-save t)
+;;   (TeX-parse-self t)
+;;   (TeX-save-query nil)
+;;   (TeX-PDF-mode t)
+;;   (LaTeX-beamer-item-overlay-flag nil)
+;;   (TeX-PDF-mode t)
+;;   (TeX-quote-after-quote nil)
+;;   (TeX-open-quote "\"")
+;;   (TeX-close-quote "\"")
+;;   (TeX-insert-macro-default-style 'mandatory-args-only)
+;;   )
 
 (use-package undo-tree
   :ensure t
   :init
-  (global-undo-tree-mode 1))
+  (global-undo-tree-mode))
+  
+(use-package sqlite3)
+(use-package notmuch
+  :commands notmuch-hello
+  :bind (("C-c m" . notmuch-hello)))
+(use-package exec-path-from-shell)
+
+(when (memq window-system '(mac ns x))
+  (exec-path-from-shell-initialize))
