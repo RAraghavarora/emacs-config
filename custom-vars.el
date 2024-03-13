@@ -8,7 +8,23 @@
  '(package-selected-packages
    '(exec-path-from-shell undo-tree corfu sqlite3 auctex blacken conda copy-as-format counsel-projectile dap-mode doom-modeline editorconfig ef-themes ein evil-collection evil-escape flycheck forge general helpful ivy-prescient ivy-rich lsp-ivy lsp-pyright lsp-ui no-littering obsidian org-bullets py-isort pyvenv rainbow-delimiters ripgrep smartparens spaceline-all-the-icons visual-fill-column web-mode which-key yasnippet))
  '(safe-local-variable-values
-   '((eval progn
+   '((TeX-engine . pdflatex)
+     (conda-env-autoactivate-mode . t)
+     (conda-env-name-for-buffer . default)
+     (pyvenv-workon . ~/miniconda3/envs/default)
+     (flycheck-flake8-maximum-line-length . 200)
+     (python-environment . "PYTHONPATH=~/hrc/")
+     (flycheck-flake8-maximum-line-length . 0)
+     (flycheck-checker . python-flake8)
+     (flycheck-python-mypy-executable . "~/miniconda3/envs/default/bin/mypy")
+     (flycheck-python-pyright-executable . "~/miniconda3/envs/default/bin/pyright")
+     (flycheck-python-ruff-executable . "~/miniconda3/envs/default/bin/ruff")
+     (conda-env-current-name . "default")
+     (python-shell-interpreter . "~/miniconda3/envs/default/bin/python")
+     (flycheck-python-pycompile-executable . "~/miniconda3/envs/default/bin/python")
+     (flycheck-python-flake8-executable . "~/miniconda3/envs/default/bin/flake8")
+     (flycheck-python-pylint-executable . "~/miniconda3/envs/default/bin/pylint")
+     (eval progn
            (setq projectile-project-run-cmd "bundle exec jekyll serve"))
      (conda-env-current-name . default)
      (projectile-project-run-cmd . "python C:/Users/raghav/fast-downward-23.06/fast-downward.py --alias seq-sat-fd-autotune-1 domain.pddl prob.pddl")

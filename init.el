@@ -257,8 +257,9 @@
   ([remap describe-variable] . counsel-describe-variable)
   ([remap describe-key] . helpful-key))
 
-;; (use-package tex
-;; :ensure auctex)
+(use-package tex
+:ensure auctex)
+(add-hook 'LaTeX-mode-hook 'turn-on-reftex)   ; with AUCTeX LaTeX mode
 ;; (setq-default TeX-engine 'xetex)
 
 
@@ -475,7 +476,7 @@
             (setq conda-env-home-directory (expand-file-name "~/miniconda3"))
             (setq-default mode-line-format (cons mode-line-format '(:exec conda-env-current-name)))
             ))
-
+(setq-default mode-line-format (cons '(:exec conda-env-current-name) mode-line-format))
 (setq tab-always-indent 'complete) ; Try to indent the current line, else call completion-at-point
 (setq-default indent-tabs-mode nil
               tab-width 4)
@@ -878,3 +879,4 @@
 
 (when (memq window-system '(mac ns x))
   (exec-path-from-shell-initialize))
+(setq x-select-enable-clipboard-manager nil)
