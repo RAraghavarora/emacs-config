@@ -5,6 +5,8 @@
  ;; If there is more than one, they won't work right.
  '(codeium/metadata/api_key "a6705026-aaa8-4693-b087-5f1ed392c83e")
  '(conda-anaconda-home "C:/Users/raghav/miniconda3")
+ '(custom-safe-themes
+   '("79a8c85692a05a0ce0502168bb0e00d25f021a75d8b0136b46978bddf25e3b72" default))
  '(package-selected-packages
    '(exec-path-from-shell undo-tree corfu sqlite3 auctex blacken conda copy-as-format counsel-projectile dap-mode doom-modeline editorconfig ef-themes ein evil-collection evil-escape flycheck forge general helpful ivy-prescient ivy-rich lsp-ivy lsp-pyright lsp-ui no-littering obsidian org-bullets py-isort pyvenv rainbow-delimiters ripgrep smartparens spaceline-all-the-icons visual-fill-column web-mode which-key yasnippet))
  '(safe-local-variable-values

@@ -233,7 +233,7 @@
 
 ;; (advice-add #'corfu--post-command :around #'force-debug)
 ;; (require 'git)
-(setq ein:jupyter-default-server-command "~/miniconda3/envs/default/Scripts/jupyter")
+;; (setq ein:jupyter-default-server-command "~/miniconda3/envs/default/Scripts/jupyter")
 
 
 (windmove-default-keybindings)
@@ -525,7 +525,9 @@
 
   :hook (python-mode . (lambda ()
                           (require 'lsp-pyright)
-                          (lsp)))  ; or lsp-deferred  
+                          (lsp)
+                          (add-hook 'after-save-hook 'lsp-pyright-organize-imports nil t)))
+
   )
 
 (use-package yasnippet
@@ -542,7 +544,7 @@
     (shell-command-to-string (format "isort %s" buffer-file-name))))
 
 ;; Run on file save
-(add-hook 'after-save-hook 'my-isort)
+;; (add-hook 'after-save-hook 'my-isort)
 
 (use-package treemacs
   :hook (treemacs-mode . variable-pitch-mode)
