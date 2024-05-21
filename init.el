@@ -512,31 +512,31 @@
 
 (setq dap-python-debugger 'debugpy)
 
-(use-package lsp-pyright
-  :after lsp-mode
-  :ensure t
-  :config
-  (setq lsp-clients-python-library-directories '("~/miniconda3/pkgs"))
-  (setq lsp-pyright-disable-language-service nil
-	lsp-pyright-disable-organize-imports nil
-	lsp-pyright-auto-import-completions t
-	lsp-pyright-use-library-code-for-types t
-	lsp-pyright-venv-path "~/miniconda3/envs")
+;; (use-package lsp-pyright
+;;   :after lsp-mode
+;;   :ensure t
+;;   :config
+;;   (setq lsp-clients-python-library-directories '("~/miniconda3/pkgs"))
+;;   (setq lsp-pyright-disable-language-service nil
+;; 	lsp-pyright-disable-organize-imports nil
+;; 	lsp-pyright-auto-import-completions t
+;; 	lsp-pyright-use-library-code-for-types t
+;; 	lsp-pyright-venv-path "~/miniconda3/envs")
 
-  :hook (python-mode . (lambda ()
-                          (require 'lsp-pyright)
-                          (lsp)
-                          (add-hook 'after-save-hook 'lsp-pyright-organize-imports nil t)))
+;;   :hook (python-mode . (lambda ()
+;;                           (require 'lsp-pyright)
+;;                           (lsp)
+;;                           (add-hook 'after-save-hook 'lsp-pyright-organize-imports nil t)))
 
-  )
+;;   )
 
 (use-package yasnippet
   :after lsp-mode)
 
-(use-package py-isort
-  :after python
-  :hook ((python-mode . pyvenv-mode)
-         (before-save . py-isort-before-save)))
+;; (use-package py-isort
+;;   :after python
+;;   :hook ((python-mode . pyvenv-mode)
+;;          (before-save . py-isort-before-save)))
 
 (defun my-isort ()
   "When in Python Mode, call isort on save"
@@ -882,3 +882,26 @@
 (when (memq window-system '(mac ns x))
   (exec-path-from-shell-initialize))
 (setq x-select-enable-clipboard-manager nil)
+
+(use-package mu4e
+  :ensure nil
+  :commands mu4e
+  :config
+  (setq mu4e-change-filenames-when-moving t)
+  (setq mu4e-update-interval (* 10 60))
+  (setq mu4e-get-mail-command "mbsync -a")
+  (setq mu4e-maildir "~/Mail")
+  (setq mu4e-sent-folder "/[Gmail].Sent Mail")
+  (setq mu4e-dratfs-folder "/[Gmail].Drafts")
+  (setq mu4e-trash-folder "/[Gmail].Trash")
+  (setq mu4e-refile-folder "/[Gmail].All Mail")
+
+  (setq mu4e-maildir-shortcuts
+        '(("/INBOX" . ?i)
+          ("/[Gmail].Sent Mail" . ?s)
+          ("/[Gmail].Trash" . ?t)
+          ("/[Gmail].Drafts" . ?d)
+          ("/[Gmail].All Mail" . ?a)))
+  
+  )
+
