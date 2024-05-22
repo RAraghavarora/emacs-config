@@ -36,7 +36,9 @@
      (python-shell-virtualenv-root . "C:/Users/raghav/miniconda3/envs/kaggle")
      (conda-project-env-path . "kaggle")
      (python-shell-virtualenv-root . "C:/Users/raghav/miniconda3/envs/default")
-     (conda-project-env-path . "default"))))
+     (conda-project-env-path . "default")))
+ '(smtpmail-smtp-server "smtp.gmail.com")
+ '(smtpmail-smtp-service 25))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

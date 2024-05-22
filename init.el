@@ -40,6 +40,26 @@
 
 (global-set-key (kbd "C-c i") 'my-edit-configuration)
 
+
+;; straight.el
+(setq package-enable-at-startup nil)
+(defvar bootstrap-version)
+(let ((bootstrap-file
+       (expand-file-name
+        "straight/repos/straight.el/bootstrap.el"
+        (or (bound-and-true-p straight-base-dir)
+            user-emacs-directory)))
+      (bootstrap-version 7))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://radian-software.github.io/straight.el/install.el"
+         'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
+
+
 ;; Set up package managers
 (require 'package)
 (setq package-archives '(("melpa" . "https://melpa.org/packages/")
@@ -883,25 +903,96 @@
   (exec-path-from-shell-initialize))
 (setq x-select-enable-clipboard-manager nil)
 
-(use-package mu4e
-  :ensure nil
-  :commands mu4e
-  :config
-  (setq mu4e-change-filenames-when-moving t)
-  (setq mu4e-update-interval (* 10 60))
-  (setq mu4e-get-mail-command "mbsync -a")
-  (setq mu4e-maildir "~/Mail")
-  (setq mu4e-sent-folder "/[Gmail].Sent Mail")
-  (setq mu4e-dratfs-folder "/[Gmail].Drafts")
-  (setq mu4e-trash-folder "/[Gmail].Trash")
-  (setq mu4e-refile-folder "/[Gmail].All Mail")
+;; (use-package mu4e
+;;   :straight
+;;   (:local-repo 
+;;    "/usr/share/emacs/site-lisp/mu4e/"
+;;    :type built-in)
+;; )
+ ;; (add-to-list 'load-path "/usr/share/emacs/site-lisp/mu4e")  
+(add-to-list 'load-path "/home/raghav/mu-1.12.5/mu4e/")
+(require 'mu4e)
 
-  (setq mu4e-maildir-shortcuts
-        '(("/INBOX" . ?i)
-          ("/[Gmail].Sent Mail" . ?s)
-          ("/[Gmail].Trash" . ?t)
-          ("/[Gmail].Drafts" . ?d)
-          ("/[Gmail].All Mail" . ?a)))
-  
-  )
+;; Change filenames when moving messages
+(setq mu4e-change-filenames-when-moving t)
 
+;; Refresh mail using isync every 10 minutes
+(setq mu4e-update-interval (* 0.5 60))
+(setq mu4e-get-mail-command "mbsync -a")
+
+;; Set the maildir directory
+(setq mu4e-maildir "~/Mail")
+
+;; Set the sent, drafts, trash, and refile folders
+;; (setq mu4e-sent-folder "/gmail/[Gmail]/Sent Mail")
+;; (setq mu4e-drafts-folder "/gmail/[Gmail]/Drafts")
+;; (setq mu4e-trash-folder "/gmail/[Gmail]/Trash")
+;; (setq mu4e-refile-folder "/gmail/All Mail")
+
+;; Set maildir shortcuts
+(setq mu4e-maildir-shortcuts
+      '(("/gmail/INBOX" . ?i)
+        ("/gmail/[Gmail]/Sent Mail" . ?s)
+        ("/gmail/[Gmail]/Trash" . ?t)
+        ("/gmail/[Gmail]/Drafts" . ?d)
+        ("/gmail/All Mail" . ?a)
+        ("/gmail/Starred" . ?r)))
+
+(setq mu4e t)
+
+(setq mu4e-bookmarks
+      '(("flag:unread AND NOT flag:trashed" "Unread messages" ?i)
+        ("date:today..now" "Today's messages" ?t)
+        ("date:7d..now" "Last 7 days" ?w)
+        ("from:mkrishna@iiit.ac.in" "RRC" ?r)
+        ("from:yooncs8@cs.utexas.edu" "UT Austin" ?y)
+        )
+      )
+
+
+(setq mu4e-contexts
+      (list
+       ;; Work account
+       (make-mu4e-context
+        :name "UT Austin"
+        :match-func
+          (lambda (msg)
+            (when msg
+              (string-prefix-p "/Austin" (mu4e-message-field msg :maildir))))
+        :vars '((user-mail-address . "raghavaurora@utexas.edu")
+                (user-full-name    . "Raghav Arora")
+                (smtpmail-smtp-server  . "smtp.gmail.com")
+                (smtpmail-smtp-service . 465)
+                (smtpmail-stream-type  . ssl)
+                (mu4e-drafts-folder  . "/Austin/[Gmail]/Drafts")
+                (mu4e-sent-folder  . "/Austin/[Gmail]/Sent Mail")
+                (mu4e-refile-folder  . "/Austin/[Gmail]/All Mail")
+                (mu4e-trash-folder  . "/Austin/[Gmail]/Trash")))
+
+       ;; Personal account
+       (make-mu4e-context
+        :name "Personal"
+        :match-func
+          (lambda (msg)
+            (when msg
+              (string-prefix-p "/gmail" (mu4e-message-field msg :maildir))))
+        :vars '((user-mail-address . "raghavarora2012.ra@gmail.com")
+                (user-full-name    . "Raghav Arora")
+                (smtpmail-smtp-server  . "smtp.gmail.com")
+                (smtpmail-smtp-service . 465)
+                (smtpmail-stream-type  . ssl)
+                (mu4e-sent-folder . "/gmail/[Gmail]/Sent Mail")
+                (mu4e-drafts-folder . "/gmail/[Gmail]/Drafts")
+                (mu4e-trash-folder . "/gmail/[Gmail]/Trash")
+                (mu4e-refile-folder . "/gmail/All Mail")))))
+
+
+(setq smtpmail-smtp-server "smtp.gmail.com"
+      smtpmail-smtp-service 465
+      smtpmail-stream-type 'ssl)
+
+(setq message-send-mail-function 'smtpmail-send-it)
+
+(setq mu4e-compose-format-flowed t)
+(setq mu4e-view-show-images t)
+(setq mu4e-compose-signature "Raghav Arora\n(https://raraghavarora.github.io/)")
